@@ -1,0 +1,66 @@
+{
+  "name": "dsh-mcp-native",
+  "version": "1.0.0",
+  "description": "MCP server manager for DeepSeek Harness — manage this machine's MCP servers as native Loader rows, from a Settings page with cards, search, start/stop and a full config editor. · DSH 本机 MCP 管理器：把 MCP 服务器当原生 Loader 行管理，设置页卡片列表 + 搜索 + 启动/停用 + 配置编辑。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "icon.svg"
+  ],
+  "license": "MIT",
+  "author": "fanyongbing",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fanyongbing/dsh-mcp-native.git"
+  },
+  "homepage": "https://github.com/fanyongbing/dsh-mcp-native#readme",
+  "bugs": {
+    "url": "https://github.com/fanyongbing/dsh-mcp-native/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node test/host.test.mjs && node test/client.test.mjs"
+  },
+  "keywords": [
+    "deepseek",
+    "harness",
+    "dsh",
+    "dsh-plugin",
+    "mcp",
+    "model-context-protocol",
+    "mcp-client",
+    "settings"
+  ],
+  "dsh": {
+    "engines": {
+      "dsh": ">=0.2.0-rc.1"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh": ">=0.2.0-rc.1"
+  }
+}

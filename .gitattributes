@@ -1,0 +1,9 @@
+# Keep the repository byte-identical across platforms: every shipped file is
+# UTF-8 text with LF endings, so a clone on Windows matches the published
+# tarball and CI never sees a phantom diff.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.tgz binary
