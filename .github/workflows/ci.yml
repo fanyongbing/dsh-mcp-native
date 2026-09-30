@@ -40,9 +40,17 @@ jobs:
         run: |
           npm pack --pack-destination . > /dev/null
           tarball="$(ls dsh-mcp-native-*.tgz)"
+          # List to a file, never through a pipe: `grep -q` exits on the first
+          # match and would close the pipe under tar, tripping `set -o pipefail`.
+          listing="$(mktemp)"
+          tar -tzf "$tarball" > "$listing"
           echo "--- $tarball ---"
-          tar -tzf "$tarball" | sort
-          tar -tzf "$tarball" | grep -qx 'package/lib/index.js'
-          tar -tzf "$tarball" | grep -qx 'package/lib/client.js'
-          tar -tzf "$tarball" | grep -qx 'package/cordis.patch.yml'
-          tar -tzf "$tarball" | grep -qx 'package/package.json'
+          sort "$listing"
+          for expected in \
+            package/lib/index.js \
+            package/lib/client.js \
+            package/cordis.patch.yml \
+            package/package.json
+          do
+            grep -qx "$expected" "$listing"
+          done
