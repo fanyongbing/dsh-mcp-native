@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: node ${{ matrix.node }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 22]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      # No install step: the plugin has zero runtime dependencies and ships its
+      # own plain-JS halves, so a fresh checkout is already runnable.
+      - name: Host half — loader integration (50 checks)
+        run: node test/host.test.mjs
+
+      - name: Browser half — bundle contract (21 checks)
+        run: node test/client.test.mjs
+
+      - name: Every shipped module parses
+        run: for file in lib/*.js; do node --check "$file"; done
+
+      - name: npm tarball carries both halves and the bundle patch
+        run: |
+          npm pack --pack-destination . > /dev/null
+          tarball="$(ls dsh-mcp-native-*.tgz)"
+          echo "--- $tarball ---"
+          tar -tzf "$tarball" | sort
+          tar -tzf "$tarball" | grep -qx 'package/lib/index.js'
+          tar -tzf "$tarball" | grep -qx 'package/lib/client.js'
+          tar -tzf "$tarball" | grep -qx 'package/cordis.patch.yml'
+          tar -tzf "$tarball" | grep -qx 'package/package.json'
